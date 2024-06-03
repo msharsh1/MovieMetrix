@@ -8,22 +8,20 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import nltk
 
-# Download NLTK data
+#Download NLTK
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Load dataset from CSV file (update the file path)
+#Load CSV
 df = pd.read_csv('Net.csv')
 
-# Handling missing values in the necessary columns
 df.fillna('NA', inplace=True)
 
-# Initialize NLTK tools
 stop_words = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
 
-# Function to preprocess text by removing stopwords and lemmatizing
+#preprocess text by removing stopwords and lemmatizing
 def preprocess_text(text):
     if not isinstance(text, str):
         text = 'NA'
@@ -31,7 +29,7 @@ def preprocess_text(text):
     words = [lemmatizer.lemmatize(word) for word in words if word.isalnum() and word not in stop_words]
     return ' '.join(words)
 
-# Preprocessing function for the dataframe
+# Preprocessing for the dataframe
 def preprocess(row):
     text_elements = [
         row['Title'], row['Genre'], row['Tags'], row['Languages'], 
@@ -40,14 +38,14 @@ def preprocess(row):
     processed_elements = [preprocess_text(str(element)) for element in text_elements]
     return ' '.join(processed_elements)
 
-# Apply preprocessing
+#Apply preprocessing
 df['Processed_Text'] = df.apply(preprocess, axis=1)
 
-# Function to recommend movies based on user prompt
+#recommend movies based on user prompt
 def recommend_movies(user_prompt, dataframe, top_n=10):
     user_prompt = preprocess_text(user_prompt)
     
-    # Vectorize the movie descriptions
+    # Vectorize movie descriptions
     vectorizer = TfidfVectorizer()
     movie_vectors = vectorizer.fit_transform(dataframe['Processed_Text'])
 
@@ -75,7 +73,7 @@ def detect_mood(user_prompt):
     else:
         return 'neutral'
 
-# Function to recommend movies based on user's mood and tags/genres
+#recommend movies based on user's mood and tags/genres
 def recommend_movies_by_mood(user_prompt, dataframe, top_n=5):
     user_prompt = preprocess_text(user_prompt)
     
@@ -115,13 +113,13 @@ def recommend_movies_by_mood(user_prompt, dataframe, top_n=5):
 
     return recommendations[['Title', 'Genre', 'Languages', 'Director', 'Writer', 'Actors', 'Summary', 'Poster', 'Similarity', 'IMDb Score', 'Netflix Link']]
 
-# Set the page configuration
+# Set page configuration
 st.set_page_config(
     page_title="MovieMetrix",
     page_icon="production.png",  # You can use an emoji or a link to a favicon image
 )
 
-# Define CSS styling
+#CSS styling
 st.markdown(
     """
     <style>
